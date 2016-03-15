@@ -2,6 +2,7 @@
 
 if ! [ -d ~/.ccache/nitrogen ]; then
 echo -e "${bldred}No ccache directory, creating...${txtrst}"
+mkdir ~/.ccache
 mkdir ~/.ccache/nitrogen
 fi
 
