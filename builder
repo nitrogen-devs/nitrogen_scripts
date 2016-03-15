@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cd nitrogen
-
 export USE_PREBUILT_CHROMIUM=1
 export USE_CCACHE=1
 export CCACHE_DIR=~/.ccache/nitrogen
@@ -29,15 +27,14 @@ function build_nitrogen {
 	lunch nitrogen_$configb-userdebug
 	make otapackage
 	res2=$(date +%s.%N)
-	cd
 	echo "${bldgrn}Total time elapsed: ${txtrst}${grn}$(echo "($res2 - $res1) / 60"|bc ) minutes ($(echo "$res2 - $res1"|bc ) seconds) ${txtrst}"
 }
 
 while read -p "Please choose your option:
  1. Clean
- 2. Build geehrc
- 3. Build geeb
- 4. Build mako
+ 2. Build LG Optimus G (geehrc)
+ 3. Build LG Optimus G (geeb)
+ 4. Build LG Nexus 4 (mako)
  5. Build all
  6. Sync
  7. Abort
@@ -46,25 +43,21 @@ do
 case "$cchoice" in
 	1 )
 		make clean
-		cd
 		break
 		;;
 	2 )
 		configb=geehrc
 		build_nitrogen
-		cd
 		break
 		;;
 	3 )
 		configb=geeb
 		build_nitrogen
-		cd
 		break	
 		;;
 	4 )
 		configb=mako
 		build_nitrogen
-		cd
 		break
 		;;
 	5 )
@@ -74,29 +67,14 @@ case "$cchoice" in
 		build_nitrogen
 		configb=mako
 		build_nitrogen
-		cd
 		break
 		;;
 	6 )
 		repo sync --force-sync
-		cd device/lge/geeb
-		git pull -f
-		cd ../mako
-		git pull -f
-		cd ../../../kernel/lge/geeb
-		git pull -f
-		cd ../mako
-		git pull -f
-		cd ../../../vendor/lge/geeb
-		git pull -f
-		cd ../mako
-		git pull -f
-		cd
 		echo "Done!"
 		break
 		;;
 	7 )
-		cd
 		break
 		;;
 esac
