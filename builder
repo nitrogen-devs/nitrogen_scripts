@@ -6,6 +6,11 @@ mkdir ~/.ccache
 mkdir ~/.ccache/nitrogen
 fi
 
+if ! [ -d ~/nitrogen-build ]; then
+echo -e "${bldred}No nitrogen-build directory, creating...${txtrst}"
+mkdir ~/nitrogen-build
+fi
+
 cpucores=$(cat /proc/cpuinfo | grep 'model name' | sed -e 's/.*: //' | wc -l)
 
 export USE_PREBUILT_CHROMIUM=1
@@ -33,6 +38,13 @@ function build_nitrogen {
 	lunch nitrogen_$configb-userdebug
 	make otapackage -j$cpucores
 	res2=$(date +%s.%N)
+	cd out/target/product/$configb
+	FILE=$(ls *.zip | grep Nitrogen)
+	if [ -f ./$FILE ]; then
+		echo -e "${bldgrn}Copyng zip image...${txtrst}"
+		cp $FILE ~/nitrogen-build/$FILE
+	fi
+	cd ~/nitrogen
 	echo "${bldgrn}Total time elapsed: ${txtrst}${grn}$(echo "($res2 - $res1) / 60"|bc ) minutes ($(echo "$res2 - $res1"|bc ) seconds) ${txtrst}"
 }
 
@@ -46,6 +58,7 @@ while read -p "Please choose your option:
  7. Abort
 :> " cchoice
 do
+
 case "$cchoice" in
 	1 )
 		make clean
@@ -82,4 +95,5 @@ case "$cchoice" in
 		break
 		;;
 esac
+
 done
