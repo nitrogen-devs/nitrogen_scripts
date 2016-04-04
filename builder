@@ -53,9 +53,11 @@ while read -p "Please choose your option:
  2. Build LG Optimus G (geehrc)
  3. Build LG Optimus G (geeb)
  4. Build LG Nexus 4 (mako)
- 5. Build all (for high-performance computers)
- 6. Sync (force sync)
- 7. Abort
+ 5. Build Google Sprout 4
+ 6. Build Google Sprout 8
+ 7. Build all (for high-performance computers)
+ 8. Sync (force sync)
+ 9. Abort
 :> " cchoice
 do
 
@@ -79,19 +81,33 @@ case "$cchoice" in
 		break
 		;;
 	5 )
+		configb=sprout4
+		build_nitrogen
+		break
+		;;
+	6 )
+		configb=sprout8
+		build_nitrogen
+		break
+		;;
+	7 )
 		configb=geehrc
 		build_nitrogen
 		configb=geeb
 		build_nitrogen
 		configb=mako
 		build_nitrogen
+		configb=sprout4
+		build_nitrogen
+		configb=sprout8
+		build_nitrogen
 		break
 		;;
-	6 )
+	8 )
 		repo sync --force-sync -j$cpucores
 		echo "Done!"
 		;;
-	7 )
+	9 )
 		break
 		;;
 esac
