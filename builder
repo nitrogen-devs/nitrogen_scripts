@@ -33,36 +33,44 @@ bldcya=${txtbld}$(tput setaf 6) #  cyan
 txtrst=$(tput sgr0)             # Reset
 
 function build_nitrogen {
-	if [ $configb = hammerhead ]; then
+	if [ $configb = "hammerhead" ]; then
 		if ! [ -d device/lge/hammerhead ]; then
 			echo -e "${bldred}N5: No device tree, downloading...${txtrst}"
 			git clone https://github.com/nitrogen-devs/android_device_lge_hammerhead.git device/lge/hammerhead
-		elif ! [ -d kernel/lge/hammerhead ]; then
+		fi
+		if ! [ -d kernel/lge/hammerhead ]; then
 			echo -e "${bldred}N5: No kernel sources, downloading...${txtrst}"
 			git clone https://github.com/nitrogen-devs/android_kernel_lge_hammerhead.git kernel/lge/hammerhead
-		elif ! [ -d vendor/lge/hammerhead ]; then
+		fi
+		if ! [ -d vendor/lge/hammerhead ]; then
 			echo -e "${bldred}N5: No vendor, downloading...${txtrst}"
 			git clone https://github.com/nitrogen-devs/android_vendor_lge_hammerhead.git vendor/lge/hammerhead
 		fi
-	elif [ $configb = sprout4 ]; then
+	fi
+	if [ $configb = "sprout4" ]; then
 		if ! [ -d device/google/sprout4 ]; then
 			echo -e "${bldred}Sprout 4: No device tree, downloading...${txtrst}"
 			git clone https://github.com/nitrogen-devs/android_device_google_sprout4.git device/google/sprout4
-		elif ! [ -d kernel/google/sprout ]; then
+		fi
+		if ! [ -d kernel/google/sprout ]; then
 			echo -e "${bldred}Sprout 4: No kernel sources, downloading...${txtrst}"
 			git clone https://github.com/nitrogen-devs/android_kernel_google_sprout.git kernel/google/sprout
-		elif ! [ -d vendor/google/sprout ]; then
+		fi
+		if ! [ -d vendor/google/sprout ]; then
 			echo -e "${bldred}Sprout 4: No vendor, downloading...${txtrst}"
 			git clone https://github.com/nitrogen-devs/android_vendor_google_sprout.git vendor/google/sprout
-		fi	
-	elif [ $configb = sprout8 ]; then
+		fi
+	fi
+	if [ $configb = "sprout8" ]; then
 		if ! [ -d device/google/sprout8 ]; then
 			echo -e "${bldred}Sprout 8: No device tree, downloading...${txtrst}"
 			git clone https://github.com/nitrogen-devs/android_device_google_sprout8.git device/google/sprout8
-		elif ! [ -d kernel/google/sprout ]; then
+		fi
+		if ! [ -d kernel/google/sprout ]; then
 			echo -e "${bldred}Sprout 8: No kernel sources, downloading...${txtrst}"
 			git clone https://github.com/nitrogen-devs/android_kernel_google_sprout.git kernel/google/sprout
-		elif ! [ -d vendor/google/sprout ]; then
+		fi
+		if ! [ -d vendor/google/sprout ]; then
 			echo -e "${bldred}Sprout 8: No vendor, downloading...${txtrst}"
 			git clone https://github.com/nitrogen-devs/android_vendor_google_sprout.git vendor/google/sprout
 		fi
@@ -87,44 +95,60 @@ function build_nitrogen {
 
 function sync_nitrogen {
 	repo sync --force-sync -j$cpucores
-	if ! [ -d device/lge/hammerhead ]; then
+	if [ -d device/lge/hammerhead ]; then
 		cd device/lge/hammerhead
 		git pull -f
 		cd ~/$nitrogen_dir
-	elif ! [ -d kernel/lge/hammerhead ]; then
-		cd kernel/lge/hammerhead
-		git pull -f
-		cd ~/$nitrogen_dir
-	elif ! [ -d vendor/lge/hammerhead ]; then
-		cd kernel/lge/hammerhead
-		git pull -f
-		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-devs/android_device_lge_hammerhead.git device/lge/hammerhead
 	fi
-	if ! [ -d device/google/sprout4 ]; then
+
+	if [ -d kernel/lge/hammerhead ]; then
+		cd kernel/lge/hammerhead
+		git pull -f
+		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-devs/android_kernel_lge_hammerhead.git kernel/lge/hammerhead
+	fi
+
+	if [ -d vendor/lge/hammerhead ]; then
+		cd kernel/lge/hammerhead
+		git pull -f
+		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-devs/android_vendor_lge_hammerhead.git vendor/lge/hammerhead
+	fi
+
+	if [ -d device/google/sprout4 ]; then
 		cd device/google/sprout4
 		git pull -f
 		cd ~/$nitrogen_dir
-	elif ! [ -d kernel/google/sprout4 ]; then
-		cd kernel/google/sprout4
-		git pull -f
-		cd ~/$nitrogen_dir
-	elif ! [ -d vendor/google/sprout4 ]; then
-		cd kernel/google/sprout4
-		git pull -f
-		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-devs/android_device_google_sprout4.git device/google/sprout4
 	fi
-	if ! [ -d device/google/sprout8 ]; then
+
+	if [ -d device/google/sprout8 ]; then
 		cd device/google/sprout8
 		git pull -f
 		cd ~/$nitrogen_dir
-	elif ! [ -d kernel/google/sprout8 ]; then
-		cd kernel/google/sprout8
+	else
+		git clone https://github.com/nitrogen-devs/android_device_google_sprout8.git device/google/sprout8
+	fi
+
+	if [ -d kernel/google/sprout ]; then
+		cd kernel/google/sprout
 		git pull -f
 		cd ~/$nitrogen_dir
-	elif ! [ -d vendor/google/sprout8 ]; then
-		cd kernel/google/sprout8
+	else
+		git clone https://github.com/nitrogen-devs/android_kernel_google_sprout.git kernel/google/sprout
+	fi
+
+	if [ -d vendor/google/sprout ]; then
+		cd kernel/google/sprout
 		git pull -f
 		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-devs/android_vendor_google_sprout.git vendor/google/sprout
 	fi
 }
 
@@ -171,12 +195,12 @@ case "$cchoice" in
 		break
 		;;
 	7 )
-		configb=sprout4
+		configb=hammerhead
 		build_nitrogen
 		break
 		;;
 	8 )
-		configb=hammerhead
+		configb=sprout4
 		build_nitrogen
 		break
 		;;
