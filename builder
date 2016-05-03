@@ -22,17 +22,84 @@ export CCACHE_DIR=~/.ccache/nitrogen
 configb=null
 
 # Colorize and add text parameters
-red=$(tput setaf 1)             #  red
-grn=$(tput setaf 2)             #  green
-cya=$(tput setaf 6)             #  cyan
-txtbld=$(tput bold)             # Bold
+red=$(tput setaf 1)			 #  red
+grn=$(tput setaf 2)			 #  green
+cya=$(tput setaf 6)			 #  cyan
+txtbld=$(tput bold)			 # Bold
 bldred=${txtbld}$(tput setaf 1) #  red
 bldgrn=${txtbld}$(tput setaf 2) #  green
 bldblu=${txtbld}$(tput setaf 4) #  blue
 bldcya=${txtbld}$(tput setaf 6) #  cyan
-txtrst=$(tput sgr0)             # Reset
+txtrst=$(tput sgr0)			 # Reset
 
 function build_nitrogen {
+	repo_clone
+	echo -e "${bldblu}Setting up environment ${txtrst}"
+	prebuilts/misc/linux-x86/ccache/ccache -M 50G
+	. build/envsetup.sh
+	clear
+	echo -e "${bldblu}Starting compilation ${txtrst}"
+	res1=$(date +%s.%N)
+	lunch nitrogen_$configb-userdebug
+	clear
+	make otapackage -j$cpucores
+	res2=$(date +%s.%N)
+	cd out/target/product/$configb
+	FILE=$(ls *.zip | grep Nitrogen)
+	if [ -f ./$FILE ]; then
+		echo -e "${bldgrn}Copyng zip file...${txtrst}"
+		cp $FILE ~/$nitrogen_build_dir/$FILE
+	else
+		echo -e "${bldred}Error copyng zip!${txtrst}"
+	fi
+	cd ~/$nitrogen_dir
+	clear
+	echo "${bldgrn}Total time elapsed: ${txtrst}${grn}$(echo "($res2 - $res1) / 60"|bc ) minutes ($(echo "$res2 - $res1"|bc ) seconds) ${txtrst}"
+}
+
+function repo_clone {
+	if [ $configb = "geehrc" ]; then
+		if ! [ -d device/lge/geehrc ]; then
+			echo -e "${bldred}geehrc: No device tree, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-project/android_device_lge_geehrc.git device/lge/geehrc
+		fi
+		if ! [ -d kernel/lge/geehrc ]; then
+			echo -e "${bldred}geehrc: No kernel sources, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-project/android_kernel_lge_geehrc.git kernel/lge/geehrc
+		fi
+		if ! [ -d vendor/lge/geehrc ]; then
+			echo -e "${bldred}geehrc: No vendor, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-project/android_vendor_lge_geehrc.git vendor/lge/geehrc
+		fi
+	fi
+	if [ $configb = "geeb" ]; then
+		if ! [ -d device/lge/geeb ]; then
+			echo -e "${bldred}geeb: No device tree, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-devs/android_device_lge_geeb.git device/lge/geeb
+		fi
+		if ! [ -d kernel/lge/geeb ]; then
+			echo -e "${bldred}geeb: No kernel sources, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-devs/android_kernel_lge_geeb.git kernel/lge/geeb
+		fi
+		if ! [ -d vendor/lge/geeb ]; then
+			echo -e "${bldred}geeb: No vendor, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-devs/android_vendor_lge_geeb.git vendor/lge/geeb
+		fi
+	fi
+	if [ $configb = "mako" ]; then
+		if ! [ -d device/lge/mako ]; then
+			echo -e "${bldred}N4: No device tree, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-devs/android_device_lge_mako.git device/lge/mako
+		fi
+		if ! [ -d kernel/lge/mako ]; then
+			echo -e "${bldred}N4: No kernel sources, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-devs/android_kernel_lge_mako.git kernel/lge/mako
+		fi
+		if ! [ -d vendor/lge/mako ]; then
+			echo -e "${bldred}N4: No vendor, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-devs/android_vendor_lge_mako.git vendor/lge/mako
+		fi
+	fi
 	if [ $configb = "hammerhead" ]; then
 		if ! [ -d device/lge/hammerhead ]; then
 			echo -e "${bldred}N5: No device tree, downloading...${txtrst}"
@@ -75,26 +142,87 @@ function build_nitrogen {
 			git clone https://github.com/nitrogen-devs/android_vendor_google_sprout.git vendor/google/sprout
 		fi
 	fi
-	echo -e "${bldblu}Setting up environment ${txtrst}"
-	prebuilts/misc/linux-x86/ccache/ccache -M 50G
-	. build/envsetup.sh
-	echo -e "${bldblu}Starting compilation ${txtrst}"
-	res1=$(date +%s.%N)
-	lunch nitrogen_$configb-userdebug
-	make otapackage -j$cpucores
-	res2=$(date +%s.%N)
-	cd out/target/product/$configb
-	FILE=$(ls *.zip | grep Nitrogen)
-	if [ -f ./$FILE ]; then
-		echo -e "${bldgrn}Copyng zip image...${txtrst}"
-		cp $FILE ~/$nitrogen_build_dir/$FILE
-	fi
-	cd ~/$nitrogen_dir
-	echo "${bldgrn}Total time elapsed: ${txtrst}${grn}$(echo "($res2 - $res1) / 60"|bc ) minutes ($(echo "$res2 - $res1"|bc ) seconds) ${txtrst}"
 }
 
 function sync_nitrogen {
 	repo sync --force-sync -j$cpucores
+
+	# GEEHRC
+	if [ -d device/lge/geehrc ]; then
+		cd device/lge/geehrc
+		git pull -f
+		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-project/android_device_lge_geehrc.git device/lge/geehrc
+	fi
+
+	if [ -d kernel/lge/geehrc ]; then
+		cd kernel/lge/geehrc
+		git pull -f
+		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-project/android_kernel_lge_geehrc.git kernel/lge/geehrc
+	fi
+
+	if [ -d vendor/lge/geehrc ]; then
+		cd kernel/lge/geehrc
+		git pull -f
+		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-project/android_vendor_lge_geehrc.git vendor/lge/geehrc
+	fi
+	
+	# GEEB
+	if [ -d device/lge/geeb ]; then
+		cd device/lge/geeb
+		git pull -f
+		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-devs/android_device_lge_geeb.git device/lge/geeb
+	fi
+
+	if [ -d kernel/lge/geeb ]; then
+		cd kernel/lge/geeb
+		git pull -f
+		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-devs/android_kernel_lge_geeb.git kernel/lge/geeb
+	fi
+
+	if [ -d vendor/lge/geeb ]; then
+		cd kernel/lge/geeb
+		git pull -f
+		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-devs/android_vendor_lge_geeb.git vendor/lge/geeb
+	fi
+	
+	# MAKO
+	if [ -d device/lge/mako ]; then
+		cd device/lge/mako
+		git pull -f
+		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-devs/android_device_lge_mako.git device/lge/mako
+	fi
+
+	if [ -d kernel/lge/mako ]; then
+		cd kernel/lge/mako
+		git pull -f
+		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-devs/android_kernel_lge_mako.git kernel/lge/mako
+	fi
+
+	if [ -d vendor/lge/mako ]; then
+		cd kernel/lge/mako
+		git pull -f
+		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-devs/android_vendor_lge_mako.git vendor/lge/mako
+	fi
+	
+	# HAMMERHEAD
 	if [ -d device/lge/hammerhead ]; then
 		cd device/lge/hammerhead
 		git pull -f
@@ -119,6 +247,7 @@ function sync_nitrogen {
 		git clone https://github.com/nitrogen-devs/android_vendor_lge_hammerhead.git vendor/lge/hammerhead
 	fi
 
+	# SPROUT4
 	if [ -d device/google/sprout4 ]; then
 		cd device/google/sprout4
 		git pull -f
@@ -127,6 +256,7 @@ function sync_nitrogen {
 		git clone https://github.com/nitrogen-devs/android_device_google_sprout4.git device/google/sprout4
 	fi
 
+	# SPROUT8
 	if [ -d device/google/sprout8 ]; then
 		cd device/google/sprout8
 		git pull -f
@@ -135,6 +265,7 @@ function sync_nitrogen {
 		git clone https://github.com/nitrogen-devs/android_device_google_sprout8.git device/google/sprout8
 	fi
 
+	# SPROUT COMMON
 	if [ -d kernel/google/sprout ]; then
 		cd kernel/google/sprout
 		git pull -f
@@ -152,17 +283,17 @@ function sync_nitrogen {
 	fi
 }
 
-while read -p "Please choose your option:
+while read -p "${grn}Please choose your option:${txtrst}
  1. Install soft, libs
  2. Sync sources (force sync)
  3. Clean (clean all build files)
- 4. Build LG Optimus G (geehrc)
- 5. Build LG Optimus G (geeb)
- 6. Build LG Nexus 4 (mako)
- 7. Build LG Nexus 5 (hammerhead)
- 8. Build Google Sprout 4
- 9. Build Google Sprout 8
- 10. Build all (for high-performance computers)
+ 4. Build ${bldblu}LG Optimus G${txtrst} (geehrc)
+ 5. Build ${bldgrn}LG Optimus G${txtrst} (geeb)
+ 6. Build ${bldcya}LG Nexus 4${txtrst} (mako)
+ 7. Build ${bldred}LG Nexus 5${txtrst} (hammerhead)
+ 8. Build ${bldblu}Google Sprout 4${txtrst}
+ 9. Build ${bldgrn}Google Sprout 8${txtrst}
+ 10. ${bldred}Build all${txtrst} (for high-performance computers)${txtrst}
  11. Abort
 :> " cchoice
 do
