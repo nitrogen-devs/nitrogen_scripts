@@ -159,233 +159,224 @@ function repo_clone {
 }
 
 function sync_nitrogen {
+	if [ $sync_repo_devices = true ]; then
+		# GEEHRC
+		if [ -d device/lge/geehrc ]; then
+			cd device/lge/geehrc
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-project/android_device_lge_geehrc.git device/lge/geehrc
+		fi
+
+		if [ -d kernel/lge/geehrc ]; then
+			cd kernel/lge/geehrc
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-project/android_kernel_lge_geehrc.git kernel/lge/geehrc
+		fi
+
+		if [ -d vendor/lge/geehrc ]; then
+			cd kernel/lge/geehrc
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-project/android_vendor_lge_geehrc.git vendor/lge/geehrc
+		fi
+	
+		# GEEB
+		if [ -d device/lge/geeb ]; then
+			cd device/lge/geeb
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_device_lge_geeb.git device/lge/geeb
+		fi
+
+		if [ -d kernel/lge/geeb ]; then
+			cd kernel/lge/geeb
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_kernel_lge_geeb.git kernel/lge/geeb
+		fi
+
+		if [ -d vendor/lge/geeb ]; then
+			cd kernel/lge/geeb
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_vendor_lge_geeb.git vendor/lge/geeb
+		fi
+	
+		# MAKO
+		if [ -d device/lge/mako ]; then
+			cd device/lge/mako
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_device_lge_mako.git device/lge/mako
+		fi
+
+		if [ -d kernel/lge/mako ]; then
+			cd kernel/lge/mako
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_kernel_lge_mako.git kernel/lge/mako
+		fi
+
+		if [ -d vendor/lge/mako ]; then
+			cd kernel/lge/mako
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_vendor_lge_mako.git vendor/lge/mako
+		fi
+	
+		# HAMMERHEAD
+		if [ -d device/lge/hammerhead ]; then
+			cd device/lge/hammerhead
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_device_lge_hammerhead.git device/lge/hammerhead
+		fi
+
+		if [ -d kernel/lge/hammerhead ]; then
+			cd kernel/lge/hammerhead
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_kernel_lge_hammerhead.git kernel/lge/hammerhead
+		fi
+
+		if [ -d vendor/lge/hammerhead ]; then
+			cd kernel/lge/hammerhead
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_vendor_lge_hammerhead.git vendor/lge/hammerhead
+		fi
+
+		# BULLHEAD
+		if [ -d device/lge/bullhead ]; then
+			cd device/lge/bullhead
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_device_lge_bullhead.git device/lge/bullhead
+		fi
+
+		if [ -d kernel/lge/bullhead ]; then
+			cd kernel/lge/bullhead
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_kernel_lge_bullhead.git kernel/lge/bullhead
+		fi
+
+		if [ -d vendor/lge/bullhead ]; then
+			cd kernel/lge/bullhead
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_vendor_lge_bullhead.git vendor/lge/bullhead
+		fi
+
+		# SPROUT4
+		if [ -d device/google/sprout4 ]; then
+			cd device/google/sprout4
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_device_google_sprout4.git device/google/sprout4
+		fi
+
+		# SPROUT8
+		if [ -d device/google/sprout8 ]; then
+			cd device/google/sprout8
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_device_google_sprout8.git device/google/sprout8
+		fi
+
+		# SPROUT COMMON
+		if [ -d kernel/google/sprout ]; then
+			cd kernel/google/sprout
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_kernel_google_sprout.git kernel/google/sprout
+		fi
+
+		if [ -d vendor/google/sprout ]; then
+			cd kernel/google/sprout
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			git clone https://github.com/nitrogen-devs/android_vendor_google_sprout.git vendor/google/sprout
+		fi
+	fi
 	repo sync --force-sync -j$cpucores
-
-	# GEEHRC
-	if [ -d device/lge/geehrc ]; then
-		cd device/lge/geehrc
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-project/android_device_lge_geehrc.git device/lge/geehrc
-	fi
-
-	if [ -d kernel/lge/geehrc ]; then
-		cd kernel/lge/geehrc
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-project/android_kernel_lge_geehrc.git kernel/lge/geehrc
-	fi
-
-	if [ -d vendor/lge/geehrc ]; then
-		cd kernel/lge/geehrc
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-project/android_vendor_lge_geehrc.git vendor/lge/geehrc
-	fi
-	
-	# GEEB
-	if [ -d device/lge/geeb ]; then
-		cd device/lge/geeb
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_device_lge_geeb.git device/lge/geeb
-	fi
-
-	if [ -d kernel/lge/geeb ]; then
-		cd kernel/lge/geeb
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_kernel_lge_geeb.git kernel/lge/geeb
-	fi
-
-	if [ -d vendor/lge/geeb ]; then
-		cd kernel/lge/geeb
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_vendor_lge_geeb.git vendor/lge/geeb
-	fi
-	
-	# MAKO
-	if [ -d device/lge/mako ]; then
-		cd device/lge/mako
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_device_lge_mako.git device/lge/mako
-	fi
-
-	if [ -d kernel/lge/mako ]; then
-		cd kernel/lge/mako
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_kernel_lge_mako.git kernel/lge/mako
-	fi
-
-	if [ -d vendor/lge/mako ]; then
-		cd kernel/lge/mako
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_vendor_lge_mako.git vendor/lge/mako
-	fi
-	
-	# HAMMERHEAD
-	if [ -d device/lge/hammerhead ]; then
-		cd device/lge/hammerhead
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_device_lge_hammerhead.git device/lge/hammerhead
-	fi
-
-	if [ -d kernel/lge/hammerhead ]; then
-		cd kernel/lge/hammerhead
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_kernel_lge_hammerhead.git kernel/lge/hammerhead
-	fi
-
-	if [ -d vendor/lge/hammerhead ]; then
-		cd kernel/lge/hammerhead
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_vendor_lge_hammerhead.git vendor/lge/hammerhead
-	fi
-
-	# BULLHEAD
-	if [ -d device/lge/bullhead ]; then
-		cd device/lge/bullhead
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_device_lge_bullhead.git device/lge/bullhead
-	fi
-
-	if [ -d kernel/lge/bullhead ]; then
-		cd kernel/lge/bullhead
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_kernel_lge_bullhead.git kernel/lge/bullhead
-	fi
-
-	if [ -d vendor/lge/bullhead ]; then
-		cd kernel/lge/bullhead
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_vendor_lge_bullhead.git vendor/lge/bullhead
-	fi
-
-	# SPROUT4
-	if [ -d device/google/sprout4 ]; then
-		cd device/google/sprout4
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_device_google_sprout4.git device/google/sprout4
-	fi
-
-	# SPROUT8
-	if [ -d device/google/sprout8 ]; then
-		cd device/google/sprout8
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_device_google_sprout8.git device/google/sprout8
-	fi
-
-	# SPROUT COMMON
-	if [ -d kernel/google/sprout ]; then
-		cd kernel/google/sprout
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_kernel_google_sprout.git kernel/google/sprout
-	fi
-
-	if [ -d vendor/google/sprout ]; then
-		cd kernel/google/sprout
-		git pull -f
-		cd ~/$nitrogen_dir
-	else
-		git clone https://github.com/nitrogen-devs/android_vendor_google_sprout.git vendor/google/sprout
-	fi
 }
 
 while read -p "${grn}Please choose your option:${txtrst}
- 1. Install soft, libs
- 2. Sync sources (force sync)
- 3. Clean (clean all build files)
- 4. Build ${bldblu}LG Optimus G${txtrst} (geehrc)
- 5. Build ${bldgrn}LG Optimus G${txtrst} (geeb)
- 6. Build ${bldcya}LG Nexus 4${txtrst} (mako)
- 7. Build ${bldred}LG Nexus 5${txtrst} (hammerhead)
- 8. Build ${bldcya}LG Nexus 5X${txtrst} (bullhead)
- 9. Build ${bldblu}Google Sprout 4${txtrst}
- 10. Build ${bldgrn}Google Sprout 8${txtrst}
- 11. ${bldred}Build all${txtrst} (for high-performance computers)${txtrst}
- 12. Abort
+ 1. Build ${bldblu}LG Optimus G${txtrst} (geehrc)
+ 2. Build ${bldgrn}LG Optimus G${txtrst} (geeb)
+ 3. Build ${bldcya}LG Nexus 4${txtrst} (mako)
+ 4. Build ${bldred}LG Nexus 5${txtrst} (hammerhead)
+ 5. Build ${bldcya}LG Nexus 5X${txtrst} (bullhead)
+ 6. Build ${bldblu}Google Sprout 4${txtrst}
+ 7. Build ${bldgrn}Google Sprout 8${txtrst}
+ 8. ${bldred}Build all${txtrst} (for high-performance computers)${txtrst}
+ 9. Install soft, libs
+ 10. Sync sources (force sync)
+ 11. Sync sources (force sync) and device repos
+ 12. Clean (clean all build files)
+ 13. Abort
 :> " cchoice
 do
 
 case "$cchoice" in
 	1 )
-		sudo apt-get install bison build-essential curl flex lib32ncurses5-dev lib32readline-gplv2-dev lib32z1-dev libesd0-dev libncurses5-dev libsdl1.2-dev libwxgtk2.8-dev libxml2 libxml2-utils lzop openjdk-7-jdk openjdk-7-jre pngcrush schedtool squashfs-tools xsltproc zip zlib1g-dev git-core make phablet-tools gperf
-		echo -e "Done!"
-		;;
-	2 )
-		sync_nitrogen
-		echo "Done!"
-		;;
-	3 )
-		make clean
-		;;
-	4 )
 		configb=geehrc
 		build_nitrogen
 		break
 		;;
-	5 )
+	2 )
 		configb=geeb
 		build_nitrogen
 		break	
 		;;
-	6 )
+	3 )
 		configb=mako
 		build_nitrogen
 		break
 		;;
-	7 )
+	4 )
 		configb=hammerhead
 		build_nitrogen
 		break
 		;;
-	8 )
+	5 )
 		configb=bullhead
 		build_nitrogen
 		break
 		;;
-	9 )
+	6 )
 		configb=sprout4
 		build_nitrogen
 		break
 		;;
-	10 )
+	7 )
 		configb=sprout8
 		build_nitrogen
 		break
 		;;
-	11 )
+	8 )
 		configb=geehrc
 		build_nitrogen
 		configb=geeb
@@ -402,7 +393,25 @@ case "$cchoice" in
 		build_nitrogen
 		break
 		;;
+
+	9 )
+		sudo apt-get install bison build-essential curl flex lib32ncurses5-dev lib32readline-gplv2-dev lib32z1-dev libesd0-dev libncurses5-dev libsdl1.2-dev libwxgtk2.8-dev libxml2 libxml2-utils lzop openjdk-7-jdk openjdk-7-jre pngcrush schedtool squashfs-tools xsltproc zip zlib1g-dev git-core make phablet-tools gperf
+		echo -e "Done!"
+		;;
+	10 )
+		sync_repo_devices=false
+		sync_nitrogen
+		echo "Done!"
+		;;
+	11 )
+		sync_repo_devices=true
+		sync_nitrogen
+		echo "Done!"
+		;;
 	12 )
+		make clean
+		;;
+	13 )
 		break
 		;;
 esac
