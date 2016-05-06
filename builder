@@ -114,6 +114,20 @@ function repo_clone {
 			git clone https://github.com/nitrogen-devs/android_vendor_lge_hammerhead.git vendor/lge/hammerhead
 		fi
 	fi
+	if [ $configb = "bullhead" ]; then
+		if ! [ -d device/lge/bullhead ]; then
+			echo -e "${bldred}N5X: No device tree, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-devs/android_device_lge_bullhead.git device/lge/bullhead
+		fi
+		if ! [ -d kernel/lge/bullhead ]; then
+			echo -e "${bldred}N5X: No kernel sources, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-devs/android_kernel_lge_bullhead.git kernel/lge/bullhead
+		fi
+		if ! [ -d vendor/lge/bullhead ]; then
+			echo -e "${bldred}N5X: No vendor, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-devs/android_vendor_lge_bullhead.git vendor/lge/bullhead
+		fi
+	fi
 	if [ $configb = "sprout4" ]; then
 		if ! [ -d device/google/sprout4 ]; then
 			echo -e "${bldred}Sprout 4: No device tree, downloading...${txtrst}"
@@ -247,6 +261,31 @@ function sync_nitrogen {
 		git clone https://github.com/nitrogen-devs/android_vendor_lge_hammerhead.git vendor/lge/hammerhead
 	fi
 
+	# BULLHEAD
+	if [ -d device/lge/bullhead ]; then
+		cd device/lge/bullhead
+		git pull -f
+		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-devs/android_device_lge_bullhead.git device/lge/bullhead
+	fi
+
+	if [ -d kernel/lge/bullhead ]; then
+		cd kernel/lge/bullhead
+		git pull -f
+		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-devs/android_kernel_lge_bullhead.git kernel/lge/bullhead
+	fi
+
+	if [ -d vendor/lge/bullhead ]; then
+		cd kernel/lge/bullhead
+		git pull -f
+		cd ~/$nitrogen_dir
+	else
+		git clone https://github.com/nitrogen-devs/android_vendor_lge_bullhead.git vendor/lge/bullhead
+	fi
+
 	# SPROUT4
 	if [ -d device/google/sprout4 ]; then
 		cd device/google/sprout4
@@ -291,10 +330,11 @@ while read -p "${grn}Please choose your option:${txtrst}
  5. Build ${bldgrn}LG Optimus G${txtrst} (geeb)
  6. Build ${bldcya}LG Nexus 4${txtrst} (mako)
  7. Build ${bldred}LG Nexus 5${txtrst} (hammerhead)
- 8. Build ${bldblu}Google Sprout 4${txtrst}
- 9. Build ${bldgrn}Google Sprout 8${txtrst}
- 10. ${bldred}Build all${txtrst} (for high-performance computers)${txtrst}
- 11. Abort
+ 8. Build ${bldcya}LG Nexus 5X${txtrst} (bullhead)
+ 9. Build ${bldblu}Google Sprout 4${txtrst}
+ 10. Build ${bldgrn}Google Sprout 8${txtrst}
+ 11. ${bldred}Build all${txtrst} (for high-performance computers)${txtrst}
+ 12. Abort
 :> " cchoice
 do
 
@@ -331,16 +371,21 @@ case "$cchoice" in
 		break
 		;;
 	8 )
-		configb=sprout4
+		configb=bullhead
 		build_nitrogen
 		break
 		;;
 	9 )
-		configb=sprout8
+		configb=sprout4
 		build_nitrogen
 		break
 		;;
 	10 )
+		configb=sprout8
+		build_nitrogen
+		break
+		;;
+	11 )
 		configb=geehrc
 		build_nitrogen
 		configb=geeb
@@ -349,13 +394,15 @@ case "$cchoice" in
 		build_nitrogen
 		configb=hammerhead
 		build_nitrogen
+		configb=bullhead
+		build_nitrogen
 		configb=sprout4
 		build_nitrogen
 		configb=sprout8
 		build_nitrogen
 		break
 		;;
-	11 )
+	12 )
 		break
 		;;
 esac
