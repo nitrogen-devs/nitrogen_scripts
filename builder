@@ -1,17 +1,32 @@
 #!/bin/bash
+# Copyright (C) 2016 Nitrogen Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Nitrogen OS builder script v.2.1
 
 nitrogen_dir=nitrogen
 nitrogen_build_dir=nitrogen-build
 
 if ! [ -d ~/.ccache/$nitrogen_dir ]; then
-echo -e "${bldred}No ccache directory, creating...${txtrst}"
-mkdir ~/.ccache
-mkdir ~/.ccache/$nitrogen_dir
+	echo -e "${bldred}No ccache directory, creating...${txtrst}"
+	mkdir ~/.ccache
+	mkdir ~/.ccache/$nitrogen_dir
 fi
 
 if ! [ -d ~/nitrogen-build ]; then
-echo -e "${bldred}No nitrogen-build directory, creating...${txtrst}"
-mkdir ~/$nitrogen_build_dir
+	echo -e "${bldred}No nitrogen-build directory, creating...${txtrst}"
+	mkdir ~/$nitrogen_build_dir
 fi
 
 cpucores=$(cat /proc/cpuinfo | grep 'model name' | sed -e 's/.*: //' | wc -l)
@@ -20,6 +35,7 @@ export USE_PREBUILT_CHROMIUM=1
 export USE_CCACHE=1
 export CCACHE_DIR=~/.ccache/nitrogen
 configb=null
+build_img=null
 
 # Colorize and add text parameters
 red=$(tput setaf 1)			 #  red
@@ -33,6 +49,10 @@ bldcya=${txtbld}$(tput setaf 6) #  cyan
 txtrst=$(tput sgr0)			 # Reset
 
 function build_nitrogen {
+	if [ $configb = "null" ]; then
+		echo "Device is not set!"
+		break
+	fi
 	repo_clone
 	echo -e "${bldblu}Setting up environment ${txtrst}"
 	prebuilts/misc/linux-x86/ccache/ccache -M 50G
@@ -53,8 +73,57 @@ function build_nitrogen {
 		echo -e "${bldred}Error copyng zip!${txtrst}"
 	fi
 	cd ~/$nitrogen_dir
-	clear
 	echo "${bldgrn}Total time elapsed: ${txtrst}${grn}$(echo "($res2 - $res1) / 60"|bc ) minutes ($(echo "$res2 - $res1"|bc ) seconds) ${txtrst}"
+}
+
+function build_images {
+	if [ $configb = "null" ]; then
+		echo "Device is not set!"
+		break
+	fi
+	repo_clone
+	prebuilts/misc/linux-x86/ccache/ccache -M 50G
+	. build/envsetup.sh
+	if [ $build_img = "null" ]; then
+		echo "Img file is not set!"
+		break
+	fi
+	if [ $build_img = "boot" ]; then
+		echo "Build boot.img/kernel..."
+		res1=$(date +%s.%N)
+		lunch nitrogen_$configb-userdebug
+		make bootimage -j$cpucores
+		res2=$(date +%s.%N)
+		echo "${bldgrn}Total time elapsed: ${txtrst}${grn}$(echo "($res2 - $res1) / 60"|bc ) minutes ($(echo "$res2 - $res1"|bc ) seconds) ${txtrst}"
+		break
+	fi
+	if [ $build_img = "recovery" ]; then
+		echo "Build recovery.img..."
+		res1=$(date +%s.%N)
+		lunch nitrogen_$configb-userdebug
+		make recoveryimage -j$cpucores
+		res2=$(date +%s.%N)
+		echo "${bldgrn}Total time elapsed: ${txtrst}${grn}$(echo "($res2 - $res1) / 60"|bc ) minutes ($(echo "$res2 - $res1"|bc ) seconds) ${txtrst}"
+		break
+	fi
+	if [ $build_img = "system" ]; then
+		echo "Build system.img..."
+		res1=$(date +%s.%N)
+		lunch nitrogen_$configb-userdebug
+		make systemimage -j$cpucores
+		res2=$(date +%s.%N)
+		echo "${bldgrn}Total time elapsed: ${txtrst}${grn}$(echo "($res2 - $res1) / 60"|bc ) minutes ($(echo "$res2 - $res1"|bc ) seconds) ${txtrst}"
+		break
+	fi
+	if [ $build_img = "all" ]; then
+		echo "Build all images..."
+		res1=$(date +%s.%N)
+		lunch nitrogen_$configb-userdebug
+		make -j$cpucores
+		res2=$(date +%s.%N)
+		echo "${bldgrn}Total time elapsed: ${txtrst}${grn}$(echo "($res2 - $res1) / 60"|bc ) minutes ($(echo "$res2 - $res1"|bc ) seconds) ${txtrst}"
+		break
+	fi
 }
 
 function repo_clone {
@@ -160,260 +229,168 @@ function repo_clone {
 
 function sync_nitrogen {
 	if [ $sync_repo_devices = true ]; then
-		# GEEHRC
-		if [ -d device/lge/geehrc ]; then
-			cd device/lge/geehrc
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-project/android_device_lge_geehrc.git device/lge/geehrc
-		fi
-
-		if [ -d kernel/lge/geehrc ]; then
-			cd kernel/lge/geehrc
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-project/android_kernel_lge_geehrc.git kernel/lge/geehrc
-		fi
-
-		if [ -d vendor/lge/geehrc ]; then
-			cd kernel/lge/geehrc
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-project/android_vendor_lge_geehrc.git vendor/lge/geehrc
-		fi
-	
-		# GEEB
-		if [ -d device/lge/geeb ]; then
-			cd device/lge/geeb
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_device_lge_geeb.git device/lge/geeb
-		fi
-
-		if [ -d kernel/lge/geeb ]; then
-			cd kernel/lge/geeb
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_kernel_lge_geeb.git kernel/lge/geeb
-		fi
-
-		if [ -d vendor/lge/geeb ]; then
-			cd kernel/lge/geeb
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_vendor_lge_geeb.git vendor/lge/geeb
-		fi
-	
-		# MAKO
-		if [ -d device/lge/mako ]; then
-			cd device/lge/mako
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_device_lge_mako.git device/lge/mako
-		fi
-
-		if [ -d kernel/lge/mako ]; then
-			cd kernel/lge/mako
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_kernel_lge_mako.git kernel/lge/mako
-		fi
-
-		if [ -d vendor/lge/mako ]; then
-			cd kernel/lge/mako
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_vendor_lge_mako.git vendor/lge/mako
-		fi
-	
-		# HAMMERHEAD
-		if [ -d device/lge/hammerhead ]; then
-			cd device/lge/hammerhead
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_device_lge_hammerhead.git device/lge/hammerhead
-		fi
-
-		if [ -d kernel/lge/hammerhead ]; then
-			cd kernel/lge/hammerhead
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_kernel_lge_hammerhead.git kernel/lge/hammerhead
-		fi
-
-		if [ -d vendor/lge/hammerhead ]; then
-			cd kernel/lge/hammerhead
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_vendor_lge_hammerhead.git vendor/lge/hammerhead
-		fi
-
-		# BULLHEAD
-		if [ -d device/lge/bullhead ]; then
-			cd device/lge/bullhead
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_device_lge_bullhead.git device/lge/bullhead
-		fi
-
-		if [ -d kernel/lge/bullhead ]; then
-			cd kernel/lge/bullhead
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_kernel_lge_bullhead.git kernel/lge/bullhead
-		fi
-
-		if [ -d vendor/lge/bullhead ]; then
-			cd kernel/lge/bullhead
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_vendor_lge_bullhead.git vendor/lge/bullhead
-		fi
-
-		# SPROUT4
-		if [ -d device/google/sprout4 ]; then
-			cd device/google/sprout4
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_device_google_sprout4.git device/google/sprout4
-		fi
-
-		# SPROUT8
-		if [ -d device/google/sprout8 ]; then
-			cd device/google/sprout8
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_device_google_sprout8.git device/google/sprout8
-		fi
-
-		# SPROUT COMMON
-		if [ -d kernel/google/sprout ]; then
-			cd kernel/google/sprout
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_kernel_google_sprout.git kernel/google/sprout
-		fi
-
-		if [ -d vendor/google/sprout ]; then
-			cd kernel/google/sprout
-			git pull -f
-			cd ~/$nitrogen_dir
-		else
-			git clone https://github.com/nitrogen-devs/android_vendor_google_sprout.git vendor/google/sprout
-		fi
+		repo_clone
 	fi
 	repo sync --force-sync -j$cpucores
 }
 
-while read -p "${grn}Please choose your option:${txtrst}
- 1. Build ${bldblu}LG Optimus G${txtrst} (geehrc)
- 2. Build ${bldgrn}LG Optimus G${txtrst} (geeb)
- 3. Build ${bldcya}LG Nexus 4${txtrst} (mako)
- 4. Build ${bldred}LG Nexus 5${txtrst} (hammerhead)
- 5. Build ${bldcya}LG Nexus 5X${txtrst} (bullhead)
- 6. Build ${bldblu}Google Sprout 4${txtrst}
- 7. Build ${bldgrn}Google Sprout 8${txtrst}
- 8. ${bldred}Build all${txtrst} (for high-performance computers)${txtrst}
- 9. Install soft, libs
- 10. Sync sources (force sync)
- 11. Sync sources (force sync) and device repos
- 12. Clean (clean all build files)
- 13. Abort
+function setjava8 {
+	while read -p "Use Java 8 for build (y/n)?" cchoice
+    do
+    case "$cchoice" in
+	y )
+		export EXPERIMENTAL_USE_JAVA8=1
+		java8true="yes"
+		break
+		;;
+	n )
+		export EXPERIMENTAL_USE_JAVA8=0
+		java8true="no"
+		break
+		;;
+	* )
+		echo "Invalid! Try again!"
+		;;
+	esac
+	done
+}
+
+function set_device {
+while read -p "${grn}Please choose your device:${txtrst}
+ 1. geehrc (LG Optimus G intl E975)
+ 2. geeb (LG Optimus G AT&T E970)
+ 3. mako (Google Nexus 4 E960)
+ 4. hammerhead (Google Nexus 5 D820, D821)
+ 5. bullhead (Google Nexus 5X H791)
+ 6. sprout4 (Google Sprout 4)
+ 7. sprout8 (Google Sprout 8)
+ 8. Abort
 :> " cchoice
 do
-
 case "$cchoice" in
 	1 )
 		configb=geehrc
-		build_nitrogen
 		break
 		;;
 	2 )
 		configb=geeb
-		build_nitrogen
 		break	
 		;;
 	3 )
 		configb=mako
-		build_nitrogen
 		break
 		;;
 	4 )
 		configb=hammerhead
-		build_nitrogen
 		break
 		;;
 	5 )
 		configb=bullhead
-		build_nitrogen
 		break
 		;;
 	6 )
 		configb=sprout4
-		build_nitrogen
 		break
 		;;
 	7 )
 		configb=sprout8
-		build_nitrogen
 		break
 		;;
 	8 )
-		configb=geehrc
-		build_nitrogen
-		configb=geeb
-		build_nitrogen
-		configb=mako
-		build_nitrogen
-		configb=hammerhead
-		build_nitrogen
-		configb=bullhead
-		build_nitrogen
-		configb=sprout4
-		build_nitrogen
-		configb=sprout8
+		break
+		;;
+	* )
+		echo "Invalid, try again!"
+		;;
+esac
+done
+}
+
+function mainmenu {
+	setjava8
+	clear
+	set_device
+	clear
+	echo "${bldcya}Nitrogen OS builder script v. 2.1${txtrst}"
+	if [ $configb = "null" ]; then
+		echo "  Device is not set!"
+	else
+		echo "  Device: $configb"
+	fi
+	if [ $java8true = "yes" ]; then
+		echo "  Java version for build: 8"
+	else
+		echo "  Java version for build: 7"
+	fi
+while read -p "${grn}Please choose your option:${txtrst}
+  1. Clean build files
+  2. Build rom to zip (ota package)
+  3. Build boot.img
+  4. Build recovery.img
+  5. Build system.img
+  6. Build all (all img files)
+  7. Sync sources (force-sync)
+  8. Sync sources and device tree (force-sync)
+  9. Reset sources
+  10. Install soft
+  11. Exit
+:> " cchoice
+do
+case "$cchoice" in
+	1 )
+		make clean && make clobber
+		clear
+		;;
+	2 )
 		build_nitrogen
 		break
 		;;
-
-	9 )
-		sudo apt-get install bison build-essential curl flex lib32ncurses5-dev lib32readline-gplv2-dev lib32z1-dev libesd0-dev libncurses5-dev libsdl1.2-dev libwxgtk2.8-dev libxml2 libxml2-utils lzop openjdk-7-jdk openjdk-7-jre pngcrush schedtool squashfs-tools xsltproc zip zlib1g-dev git-core make phablet-tools gperf
-		echo -e "Done!"
+	3 )
+		build_img="boot"
+		build_images
+		break
 		;;
-	10 )
+	4 )
+		build_img="recovery"
+		build_images
+		break
+		;;
+	5 )
+		build_img="system"
+		build_images
+		break
+		;;
+	6 )
+		build_img="all"
+		build_images
+		break
+		;;
+	7 )
 		sync_repo_devices=false
 		sync_nitrogen
 		echo "Done!"
 		;;
-	11 )
+	8 )
 		sync_repo_devices=true
 		sync_nitrogen
 		echo "Done!"
 		;;
-	12 )
-		make clean
+	9 )
+		repo forall -c git reset --hard
+		echo "Done!"
 		;;
-	13 )
+	10 )
+		sudo apt-get install bison build-essential curl flex lib32ncurses5-dev lib32readline-gplv2-dev lib32z1-dev libesd0-dev libncurses5-dev libsdl1.2-dev libwxgtk2.8-dev libxml2 libxml2-utils lzop openjdk-7-jdk openjdk-7-jre pngcrush schedtool squashfs-tools xsltproc zip zlib1g-dev git-core make phablet-tools gperf
+		echo -e "Done!"
+		;;
+	11 )
 		break
 		;;
+	* )
+		echo "Invalid! Try again!"
+		;;
 esac
-
 done
+}
+
+mainmenu
