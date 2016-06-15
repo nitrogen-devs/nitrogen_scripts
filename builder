@@ -13,7 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Nitrogen OS builder script v.2.1
+# Nitrogen OS builder script
+
+ver_script=2.2
 
 nitrogen_dir=nitrogen
 nitrogen_build_dir=nitrogen-build
@@ -62,7 +64,7 @@ function build_nitrogen {
 	res1=$(date +%s.%N)
 	lunch nitrogen_$configb-userdebug
 	clear
-	make otapackage -j$cpucores
+	make otapackage -j$cpucores 2<&1 | tee builder.log
 	res2=$(date +%s.%N)
 	cd out/target/product/$configb
 	FILE=$(ls *.zip | grep Nitrogen)
@@ -92,7 +94,7 @@ function build_images {
 		echo "Build boot.img/kernel..."
 		res1=$(date +%s.%N)
 		lunch nitrogen_$configb-userdebug
-		make bootimage -j$cpucores
+		make bootimage -j$cpucores 2<&1 | tee builder.log
 		res2=$(date +%s.%N)
 		echo "${bldgrn}Total time elapsed: ${txtrst}${grn}$(echo "($res2 - $res1) / 60"|bc ) minutes ($(echo "$res2 - $res1"|bc ) seconds) ${txtrst}"
 		break
@@ -101,7 +103,7 @@ function build_images {
 		echo "Build recovery.img..."
 		res1=$(date +%s.%N)
 		lunch nitrogen_$configb-userdebug
-		make recoveryimage -j$cpucores
+		make recoveryimage -j$cpucores 2<&1 | tee builder.log
 		res2=$(date +%s.%N)
 		echo "${bldgrn}Total time elapsed: ${txtrst}${grn}$(echo "($res2 - $res1) / 60"|bc ) minutes ($(echo "$res2 - $res1"|bc ) seconds) ${txtrst}"
 		break
@@ -110,7 +112,7 @@ function build_images {
 		echo "Build system.img..."
 		res1=$(date +%s.%N)
 		lunch nitrogen_$configb-userdebug
-		make systemimage -j$cpucores
+		make systemimage -j$cpucores 2<&1 | tee builder.log
 		res2=$(date +%s.%N)
 		echo "${bldgrn}Total time elapsed: ${txtrst}${grn}$(echo "($res2 - $res1) / 60"|bc ) minutes ($(echo "$res2 - $res1"|bc ) seconds) ${txtrst}"
 		break
@@ -119,10 +121,197 @@ function build_images {
 		echo "Build all images..."
 		res1=$(date +%s.%N)
 		lunch nitrogen_$configb-userdebug
-		make -j$cpucores
+		make -j$cpucores 2<&1 | tee builder.log
 		res2=$(date +%s.%N)
 		echo "${bldgrn}Total time elapsed: ${txtrst}${grn}$(echo "($res2 - $res1) / 60"|bc ) minutes ($(echo "$res2 - $res1"|bc ) seconds) ${txtrst}"
 		break
+	fi
+}
+
+function repo_device_sync {
+	# GEEHRC
+	if [ $configb = "geehrc" ]; then
+		if [ -d device/lge/geehrc ]; then
+			cd device/lge/geehrc
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		if [ -d kernel/lge/geehrc ]; then
+			cd kernel/lge/geehrc
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		if [ -d vendor/lge/geehrc ]; then
+			cd kernel/lge/geehrc
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+	fi
+	# GEEB
+	if [ $configb = "geeb" ]; then
+		if [ -d device/lge/geeb ]; then
+			cd device/lge/geeb
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		if [ -d kernel/lge/geeb ]; then
+			cd kernel/lge/geeb
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		if [ -d vendor/lge/geeb ]; then
+			cd kernel/lge/geeb
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+	fi
+ 	# MAKO
+	if [ $configb = "mako" ]; then
+		if [ -d device/lge/mako ]; then
+			cd device/lge/mako
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		if [ -d kernel/lge/mako ]; then
+			cd kernel/lge/mako
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		if [ -d vendor/lge/mako ]; then
+			cd kernel/lge/mako
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+	fi
+	# HAMMERHEAD
+	if [ $configb = "hammerhead" ]; then
+		if [ -d device/lge/hammerhead ]; then
+			cd device/lge/hammerhead
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		if [ -d kernel/lge/hammerhead ]; then
+			cd kernel/lge/hammerhead
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		if [ -d vendor/lge/hammerhead ]; then
+			cd kernel/lge/hammerhead
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+	fi
+	# BULLHEAD
+	if [ $configb = "bullhead" ]; then
+		if [ -d device/lge/bullhead ]; then
+			cd device/lge/bullhead
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		if [ -d kernel/lge/bullhead ]; then
+			cd kernel/lge/bullhead
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		if [ -d vendor/lge/bullhead ]; then
+			cd kernel/lge/bullhead
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+	fi
+	# SPROUT4
+	if [ $configb = "sprout4" ]; then
+		if [ -d device/google/sprout4 ]; then
+			cd device/google/sprout4
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		# SPROUT COMMON
+		if [ -d kernel/google/sprout ]; then
+			cd kernel/google/sprout
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		if [ -d vendor/google/sprout ]; then
+			cd kernel/google/sprout
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+	fi
+	# SPROUT8
+	if [ $configb = "sprout8" ]; then
+		if [ -d device/google/sprout8 ]; then
+			cd device/google/sprout8
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		# SPROUT COMMON
+		if [ -d kernel/google/sprout ]; then
+			cd kernel/google/sprout
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		if [ -d vendor/google/sprout ]; then
+			cd kernel/google/sprout
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
 	fi
 }
 
@@ -230,6 +419,7 @@ function repo_clone {
 function sync_nitrogen {
 	if [ $sync_repo_devices = true ]; then
 		repo_clone
+		repo_device_sync
 	fi
 	repo sync --force-sync -j$cpucores
 }
@@ -311,18 +501,21 @@ function mainmenu {
 	clear
 	set_device
 	clear
-	echo "${bldcya}Nitrogen OS builder script v. 2.1${txtrst}"
 	if [ $configb = "null" ]; then
-		echo "  Device is not set!"
+		device_text="Device is not set!"
 	else
-		echo "  Device: $configb"
+		device_text="Device: $configb"
 	fi
 	if [ $java8true = "yes" ]; then
-		echo "  Java version for build: 8"
+		java8text="Java version for build: 8"
 	else
-		echo "  Java version for build: 7"
+		java8text="Java version for build: 7"
 	fi
-while read -p "${grn}Please choose your option:${txtrst}
+while read -p "${bldcya}Nitrogen OS builder script v. $ver_script ${txtrst}
+  $device_text
+  $java8text
+
+${grn}Please choose your option:${txtrst}
   1. Clean build files
   2. Build rom to zip (ota package)
   3. Build boot.img
@@ -368,20 +561,20 @@ case "$cchoice" in
 	7 )
 		sync_repo_devices=false
 		sync_nitrogen
-		echo "Done!"
+		clear
 		;;
 	8 )
 		sync_repo_devices=true
 		sync_nitrogen
-		echo "Done!"
+		clear
 		;;
 	9 )
 		repo forall -c git reset --hard
-		echo "Done!"
+		clear
 		;;
 	10 )
 		sudo apt-get install bison build-essential curl flex lib32ncurses5-dev lib32readline-gplv2-dev lib32z1-dev libesd0-dev libncurses5-dev libsdl1.2-dev libwxgtk2.8-dev libxml2 libxml2-utils lzop openjdk-7-jdk openjdk-7-jre pngcrush schedtool squashfs-tools xsltproc zip zlib1g-dev git-core make phablet-tools gperf
-		echo -e "Done!"
+		clear
 		;;
 	11 )
 		break
