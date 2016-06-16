@@ -15,7 +15,7 @@
 #
 # Nitrogen OS builder script
 
-ver_script=2.2
+ver_script=2.3
 
 nitrogen_dir=nitrogen
 nitrogen_build_dir=nitrogen-build
@@ -38,6 +38,7 @@ export USE_CCACHE=1
 export CCACHE_DIR=~/.ccache/nitrogen
 configb=null
 build_img=null
+othermsg=""
 
 # Colorize and add text parameters
 red=$(tput setaf 1)			 #  red
@@ -425,7 +426,7 @@ function sync_nitrogen {
 }
 
 function setjava8 {
-	while read -p "Use Java 8 for build (y/n)?" cchoice
+	while read -p "Use Java 8 for build (y/n)? " cchoice
     do
     case "$cchoice" in
 	y )
@@ -440,6 +441,7 @@ function setjava8 {
 		;;
 	* )
 		echo "Invalid! Try again!"
+		clear
 		;;
 	esac
 	done
@@ -491,6 +493,7 @@ case "$cchoice" in
 		;;
 	* )
 		echo "Invalid, try again!"
+		clear
 		;;
 esac
 done
@@ -514,7 +517,9 @@ function mainmenu {
 while read -p "${bldcya}Nitrogen OS builder script v. $ver_script ${txtrst}
   $device_text
   $java8text
-
+  Messages:
+  $othermsg
+  
 ${grn}Please choose your option:${txtrst}
   1. Clean build files
   2. Build rom to zip (ota package)
@@ -531,7 +536,8 @@ ${grn}Please choose your option:${txtrst}
 do
 case "$cchoice" in
 	1 )
-		make clean && make clobber
+		make clean
+		othermsg="All the compiled files have been deleted."
 		clear
 		;;
 	2 )
@@ -561,19 +567,23 @@ case "$cchoice" in
 	7 )
 		sync_repo_devices=false
 		sync_nitrogen
+		othermsg="Sources have been successfully synchronized!"
 		clear
 		;;
 	8 )
 		sync_repo_devices=true
 		sync_nitrogen
+		othermsg="Sources have been successfully synchronized!"
 		clear
 		;;
 	9 )
 		repo forall -c git reset --hard
+		othermsg="Sources have been returned to its original state."
 		clear
 		;;
 	10 )
 		sudo apt-get install bison build-essential curl flex lib32ncurses5-dev lib32readline-gplv2-dev lib32z1-dev libesd0-dev libncurses5-dev libsdl1.2-dev libwxgtk2.8-dev libxml2 libxml2-utils lzop openjdk-7-jdk openjdk-7-jre pngcrush schedtool squashfs-tools xsltproc zip zlib1g-dev git-core make phablet-tools gperf
+		othermsg="Soft installed"
 		clear
 		;;
 	11 )
@@ -581,6 +591,7 @@ case "$cchoice" in
 		;;
 	* )
 		echo "Invalid! Try again!"
+		clear
 		;;
 esac
 done
