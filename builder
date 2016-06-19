@@ -15,27 +15,15 @@
 #
 # Nitrogen OS builder script
 
-ver_script=2.3
+ver_script=2.4
 
 nitrogen_dir=nitrogen
 nitrogen_build_dir=nitrogen-build
 
-if ! [ -d ~/.ccache/$nitrogen_dir ]; then
-	echo -e "${bldred}No ccache directory, creating...${txtrst}"
-	mkdir ~/.ccache
-	mkdir ~/.ccache/$nitrogen_dir
-fi
-
-if ! [ -d ~/nitrogen-build ]; then
-	echo -e "${bldred}No nitrogen-build directory, creating...${txtrst}"
-	mkdir ~/$nitrogen_build_dir
-fi
-
 cpucores=$(cat /proc/cpuinfo | grep 'model name' | sed -e 's/.*: //' | wc -l)
 
 export USE_PREBUILT_CHROMIUM=1
-export USE_CCACHE=1
-export CCACHE_DIR=~/.ccache/nitrogen
+
 configb=null
 build_img=null
 othermsg=""
@@ -58,7 +46,6 @@ function build_nitrogen {
 	fi
 	repo_clone
 	echo -e "${bldblu}Setting up environment ${txtrst}"
-	prebuilts/misc/linux-x86/ccache/ccache -M 50G
 	. build/envsetup.sh
 	clear
 	echo -e "${bldblu}Starting compilation ${txtrst}"
@@ -425,8 +412,43 @@ function sync_nitrogen {
 	repo sync --force-sync -j$cpucores
 }
 
+function setccache {
+	while read -p "Use ccache for build (y/n)?
+:> " cchoice
+    do
+    case "$cchoice" in
+	y )
+		export USE_CCACHE=1
+		export CCACHE_DIR=~/.ccache/nitrogen
+		prebuilts/misc/linux-x86/ccache/ccache -M 50G
+		if ! [ -d ~/.ccache/$nitrogen_dir ]; then
+			echo -e "${bldred}No ccache directory, creating...${txtrst}"
+			mkdir ~/.ccache
+			mkdir ~/.ccache/$nitrogen_dir
+		fi
+		if ! [ -d ~/nitrogen-build ]; then
+			echo -e "${bldred}No nitrogen-build directory, creating...${txtrst}"
+			mkdir ~/$nitrogen_build_dir
+		fi
+		ccachetrue="yes"
+		break
+		;;
+	n )
+		
+		ccachetrue="no"
+		break
+		;;
+	* )
+		echo "Invalid! Try again!"
+		clear
+		;;
+	esac
+	done
+}
+
 function setjava8 {
-	while read -p "Use Java 8 for build (y/n)? " cchoice
+	while read -p "Use Java 8 for build (y/n)?
+:> " cchoice
     do
     case "$cchoice" in
 	y )
@@ -435,7 +457,6 @@ function setjava8 {
 		break
 		;;
 	n )
-		export EXPERIMENTAL_USE_JAVA8=0
 		java8true="no"
 		break
 		;;
@@ -500,6 +521,8 @@ done
 }
 
 function mainmenu {
+	setccache
+	clear
 	setjava8
 	clear
 	set_device
@@ -514,9 +537,15 @@ function mainmenu {
 	else
 		java8text="Java version for build: 7"
 	fi
+	if [ $ccachetrue = "yes" ]; then
+		ccachetext="Use cchache for build: yes"
+	else
+		ccachetext="Use cchache for build: no"
+	fi
 while read -p "${bldcya}Nitrogen OS builder script v. $ver_script ${txtrst}
   $device_text
   $java8text
+  $ccachetext
   Messages:
   $othermsg
   
@@ -531,7 +560,8 @@ ${grn}Please choose your option:${txtrst}
   8. Sync sources and device tree (force-sync)
   9. Reset sources
   10. Install soft
-  11. Exit
+  11. Change device
+  12. Exit
 :> " cchoice
 do
 case "$cchoice" in
@@ -587,6 +617,11 @@ case "$cchoice" in
 		clear
 		;;
 	11 )
+		set_device
+		othermsg="The device is changed to $configb."
+		clear
+		;;
+	12 )
 		break
 		;;
 	* )
