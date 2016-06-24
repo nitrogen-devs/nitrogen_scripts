@@ -301,6 +301,32 @@ function repo_device_sync {
 			repo_clone
 		fi
 	fi
+	# TOMATO
+	if [ $configb = "tomato" ]; then
+		if [ -d device/yu/tomato ]; then
+			cd device/yu/tomato
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		if [ -d kernel/yu/tomato ]; then
+			cd kernel/yu/tomato
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+
+		if [ -d vendor/yu/tomato ]; then
+			cd kernel/yu/tomato
+			git pull -f
+			cd ~/$nitrogen_dir
+		else
+			repo_clone
+		fi
+	fi
 }
 
 function repo_clone {
@@ -402,6 +428,20 @@ function repo_clone {
 			git clone https://github.com/nitrogen-devs/android_vendor_google_sprout.git vendor/google/sprout
 		fi
 	fi
+	if [ $configb = "tomato" ]; then
+		if ! [ -d device/yu/tomato ]; then
+			echo -e "${bldred}tomato: No device tree, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-devs/android_device_yu_tomato.git device/yu/tomato
+		fi
+		if ! [ -d kernel/yu/tomato ]; then
+			echo -e "${bldred}tomato: No kernel sources, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-devs/android_kernel_yu_tomato.git kernel/yu/tomato
+		fi
+		if ! [ -d vendor/yu/tomato ]; then
+			echo -e "${bldred}tomato: No vendor, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-devs/android_vendor_yu_tomato.git vendor/yu/tomato
+		fi
+	fi
 }
 
 function sync_nitrogen {
@@ -477,7 +517,8 @@ while read -p "${grn}Please choose your device:${txtrst}
  5. bullhead (Google Nexus 5X H791)
  6. sprout4 (Google Sprout 4)
  7. sprout8 (Google Sprout 8)
- 8. Abort
+ 8. tomato (Yureka Tomato)
+ 9. Abort
 :> " cchoice
 do
 case "$cchoice" in
@@ -510,6 +551,10 @@ case "$cchoice" in
 		break
 		;;
 	8 )
+		configb=tomato
+		break
+		;;
+	9 )
 		break
 		;;
 	* )
