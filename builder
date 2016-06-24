@@ -15,10 +15,15 @@
 #
 # Nitrogen OS builder script
 
-ver_script=2.4
+ver_script=2.5
 
 nitrogen_dir=nitrogen
 nitrogen_build_dir=nitrogen-build
+
+if ! [ -d ~/$nitrogen_build_dir ]; then
+	echo -e "${bldred}No nitrogen-build directory, creating...${txtrst}"
+	mkdir ~/$nitrogen_build_dir
+fi
 
 cpucores=$(cat /proc/cpuinfo | grep 'model name' | sed -e 's/.*: //' | wc -l)
 
@@ -136,7 +141,7 @@ function repo_device_sync {
 		fi
 
 		if [ -d vendor/lge/geehrc ]; then
-			cd kernel/lge/geehrc
+			cd vendor/lge/geehrc
 			git pull -f
 			cd ~/$nitrogen_dir
 		else
@@ -162,7 +167,7 @@ function repo_device_sync {
 		fi
 
 		if [ -d vendor/lge/geeb ]; then
-			cd kernel/lge/geeb
+			cd vendor/lge/geeb
 			git pull -f
 			cd ~/$nitrogen_dir
 		else
@@ -188,7 +193,7 @@ function repo_device_sync {
 		fi
 
 		if [ -d vendor/lge/mako ]; then
-			cd kernel/lge/mako
+			cd vendor/lge/mako
 			git pull -f
 			cd ~/$nitrogen_dir
 		else
@@ -214,7 +219,7 @@ function repo_device_sync {
 		fi
 
 		if [ -d vendor/lge/hammerhead ]; then
-			cd kernel/lge/hammerhead
+			cd vendor/lge/hammerhead
 			git pull -f
 			cd ~/$nitrogen_dir
 		else
@@ -240,7 +245,7 @@ function repo_device_sync {
 		fi
 
 		if [ -d vendor/lge/bullhead ]; then
-			cd kernel/lge/bullhead
+			cd vendor/lge/bullhead
 			git pull -f
 			cd ~/$nitrogen_dir
 		else
@@ -267,7 +272,7 @@ function repo_device_sync {
 		fi
 
 		if [ -d vendor/google/sprout ]; then
-			cd kernel/google/sprout
+			cd vendor/google/sprout
 			git pull -f
 			cd ~/$nitrogen_dir
 		else
@@ -294,7 +299,7 @@ function repo_device_sync {
 		fi
 
 		if [ -d vendor/google/sprout ]; then
-			cd kernel/google/sprout
+			cd vendor/google/sprout
 			git pull -f
 			cd ~/$nitrogen_dir
 		else
@@ -320,7 +325,7 @@ function repo_device_sync {
 		fi
 
 		if [ -d vendor/yu/tomato ]; then
-			cd kernel/yu/tomato
+			cd vendor/yu/tomato
 			git pull -f
 			cd ~/$nitrogen_dir
 		else
@@ -465,10 +470,6 @@ function setccache {
 			echo -e "${bldred}No ccache directory, creating...${txtrst}"
 			mkdir ~/.ccache
 			mkdir ~/.ccache/$nitrogen_dir
-		fi
-		if ! [ -d ~/nitrogen-build ]; then
-			echo -e "${bldred}No nitrogen-build directory, creating...${txtrst}"
-			mkdir ~/$nitrogen_build_dir
 		fi
 		ccachetrue="yes"
 		break
@@ -663,6 +664,7 @@ case "$cchoice" in
 		;;
 	11 )
 		set_device
+		device_text="Device: $configb"
 		othermsg="The device is changed to $configb."
 		clear
 		;;
