@@ -15,10 +15,10 @@
 #
 # Nitrogen OS builder script
 
-ver_script=2.5
+ver_script=2.6
 
 nitrogen_dir=nitrogen
-nitrogen_build_dir=nitrogen-build
+nitrogen_build_dir=$nitrogen_dir-build
 
 if ! [ -d ~/$nitrogen_build_dir ]; then
 	echo -e "${bldred}No nitrogen-build directory, creating...${txtrst}"
@@ -77,7 +77,6 @@ function build_images {
 		break
 	fi
 	repo_clone
-	prebuilts/misc/linux-x86/ccache/ccache -M 50G
 	. build/envsetup.sh
 	if [ $build_img = "null" ]; then
 		echo "Img file is not set!"
@@ -306,26 +305,26 @@ function repo_device_sync {
 			repo_clone
 		fi
 	fi
-	# TOMATO
-	if [ $configb = "tomato" ]; then
-		if [ -d device/yu/tomato ]; then
-			cd device/yu/tomato
+	# SHAMU
+	if [ $configb = "shamu" ]; then
+		if [ -d device/moto/shamu ]; then
+			cd device/moto/shamu
 			git pull -f
 			cd ~/$nitrogen_dir
 		else
 			repo_clone
 		fi
 
-		if [ -d kernel/yu/tomato ]; then
-			cd kernel/yu/tomato
+		if [ -d kernel/moto/shamu ]; then
+			cd kernel/moto/shamu
 			git pull -f
 			cd ~/$nitrogen_dir
 		else
 			repo_clone
 		fi
 
-		if [ -d vendor/yu/tomato ]; then
-			cd vendor/yu/tomato
+		if [ -d vendor/moto/shamu ]; then
+			cd vendor/moto/shamu
 			git pull -f
 			cd ~/$nitrogen_dir
 		else
@@ -433,18 +432,18 @@ function repo_clone {
 			git clone https://github.com/nitrogen-devs/android_vendor_google_sprout.git vendor/google/sprout
 		fi
 	fi
-	if [ $configb = "tomato" ]; then
-		if ! [ -d device/yu/tomato ]; then
-			echo -e "${bldred}tomato: No device tree, downloading...${txtrst}"
-			git clone https://github.com/nitrogen-devs/android_device_yu_tomato.git device/yu/tomato
+	if [ $configb = "shamu" ]; then
+		if ! [ -d device/moto/shamu ]; then
+			echo -e "${bldred}shamu: No device tree, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-devs/android_device_moto_shamu.git device/moto/shamu
 		fi
-		if ! [ -d kernel/yu/tomato ]; then
-			echo -e "${bldred}tomato: No kernel sources, downloading...${txtrst}"
-			git clone https://github.com/nitrogen-devs/android_kernel_yu_tomato.git kernel/yu/tomato
+		if ! [ -d kernel/moto/shamu ]; then
+			echo -e "${bldred}shamu: No kernel sources, downloading...${txtrst}"
+			git clone https://android.googlesource.com/kernel/msm.git -b android-msm-shamu-3.10-marshmallow-mr2 kernel/moto/shamu
 		fi
-		if ! [ -d vendor/yu/tomato ]; then
-			echo -e "${bldred}tomato: No vendor, downloading...${txtrst}"
-			git clone https://github.com/nitrogen-devs/android_vendor_yu_tomato.git vendor/yu/tomato
+		if ! [ -d vendor/moto/shamu ]; then
+			echo -e "${bldred}shamu: No vendor, downloading...${txtrst}"
+			git clone https://github.com/nitrogen-devs/android_vendor_moto_shamu.git vendor/moto/shamu
 		fi
 	fi
 }
@@ -518,7 +517,7 @@ while read -p "${grn}Please choose your device:${txtrst}
  5. bullhead (Google Nexus 5X H791)
  6. sprout4 (Google Sprout 4)
  7. sprout8 (Google Sprout 8)
- 8. tomato (Yureka Tomato)
+ 8. shamu (Google Nexus 6)
  9. Abort
 :> " cchoice
 do
@@ -552,7 +551,7 @@ case "$cchoice" in
 		break
 		;;
 	8 )
-		configb=tomato
+		configb=shamu
 		break
 		;;
 	9 )
